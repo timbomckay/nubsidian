@@ -5,7 +5,8 @@ A local, browser-based markdown editor and HTML viewer for document folders scat
 ## Architecture
 
 ```
-config.json          directory roots + port — the only state the app has
+config.json          directory roots + port — the only state the app has (gitignored)
+config.example.json   reference format for config.json, committed
 server.js             Fastify: static hosting, file APIs, chokidar → SSE
 src/editor.js         TipTap setup (source), bundled by esbuild
 build.js               esbuild bundler → public/editor.bundle.js
@@ -57,6 +58,8 @@ Only `.md`/`.markdown` are editable (`EDITABLE`); `.html`/`.htm` (`VIEWABLE`) an
 - **No database** — don't add one. Persistent state beyond file contents belongs in `config.json` if it's app-level config, or in the files themselves. The one exception is sidebar collapse state, which is client-only (`localStorage`, `nubsidian.collapsedRoots`) since it's a UI preference, not app config.
 - **No frontend framework** — `public/app.js` stays vanilla JS/DOM. Don't introduce React, Vue, htmx, etc. for the shell UI.
 - **Server-side path safety is mandatory** — any new route that takes a path must go through `resolveSafe()` (or equivalent) rather than trusting client-supplied paths directly.
+- **`[hidden]` vs. explicit `display`** — several elements are shown/hidden via the `.hidden` DOM property (`editorWrap`, `htmlView`, `imgView`, `modalOverlay`, `modalInput`). If a CSS rule sets `display` unconditionally on that element's class (e.g. `.img-view { display: flex }`), it overrides the browser's built-in `[hidden] { display: none }` and the element stays visible even when "hidden" — happened twice already (`.img-view`, `.modal-input`). Always scope the `display` override to `:not([hidden])`.
+- **This repo is public on GitHub** (`timbomckay/nubsidian`) — never commit anything with real local machine paths or other personal info; that's why `config.json` is gitignored in favor of `config.example.json`.
 - **Watchers are tracked per root** (`watchers` Map in server.js, keyed by root id) so removing a root can `.close()` its chokidar watcher instead of leaking it.
 - After changing `src/editor.js`, run `npm run build` (or `npm run dev`, which builds then starts) — edits to it have no effect until the bundle regenerates.
 - After changing `config.json`, restart the server (no hot-reload for config) — though adding/removing/favoriting roots through the UI does *not* require a restart, since those routes mutate the in-memory state and watchers directly.
