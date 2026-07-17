@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nubsidian</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <aside class="sidebar">
+    <header class="sidebar-head">
+      <span class="wordmark">Nubsidian</span>
+      <div class="head-actions">
+        <button class="add-root-btn" id="collapseAllBtn" type="button" title="Collapse/expand all roots">↕</button>
+        <button class="add-root-btn" id="addRootBtn" type="button" title="Add a root directory">+</button>
+        <span class="status" id="status" title="Watching for file changes">●</span>
+      </div>
+    </header>
+    <nav id="tree" class="tree" aria-label="Documents"></nav>
+  </aside>
+
+  <main class="pane">
+    <header class="pane-head" id="paneHead" hidden>
+      <span class="crumb" id="crumb"></span>
+      <span class="save-state" id="saveState"></span>
+    </header>
+
+    <section id="empty" class="empty">
+      <div class="dashboard">
+        <p class="dashboard-hint">Select a document from the sidebar, or manage your roots below.</p>
+        <div class="root-grid" id="rootGrid"></div>
+      </div>
+    </section>
+
+    <section id="editorWrap" class="editor-wrap" hidden>
+      <div id="editor" class="editor"></div>
+    </section>
+
+    <iframe id="htmlView" class="html-view" sandbox="allow-same-origin" hidden></iframe>
+
+    <div id="imgView" class="img-view" hidden>
+      <img id="imgViewImg" alt="" />
+    </div>
+  </main>
+
+  <div id="ctxMenu" class="ctx-menu" hidden></div>
+
+  <div id="modalOverlay" class="modal-overlay" hidden>
+    <div class="modal">
+      <p class="modal-message" id="modalMessage"></p>
+      <input type="text" id="modalInput" class="modal-input" />
+      <div class="modal-actions">
+        <button id="modalCancel" type="button">Cancel</button>
+        <button id="modalOk" type="button" class="modal-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/editor.bundle.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

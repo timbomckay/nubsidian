@@ -1,0 +1,29 @@
+{
+  "name": "nubsidian",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local multi-root markdown editor and HTML viewer. Config-driven, no database.",
+  "scripts": {
+    "build": "node build.js",
+    "start": "node server.js",
+    "dev": "node build.js && node server.js"
+  },
+  "engines": {
+    "node": ">=18.11"
+  },
+  "dependencies": {
+    "@fastify/static": "^7.0.4",
+    "chokidar": "^3.6.0",
+    "fastify": "^4.28.1"
+  },
+  "devDependencies": {
+    "@tiptap/core": "^2.5.9",
+    "@tiptap/extension-link": "^2.5.9",
+    "@tiptap/extension-task-item": "^2.5.9",
+    "@tiptap/extension-task-list": "^2.5.9",
+    "@tiptap/starter-kit": "^2.5.9",
+    "esbuild": "^0.23.1",
+    "tiptap-markdown": "^0.8.10"
+  }
+}

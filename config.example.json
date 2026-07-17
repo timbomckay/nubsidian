@@ -1,0 +1,7 @@
+{
+  "port": 4321,
+  "roots": [
+    { "name": "Project One Docs", "path": "~/OneDrive/project-one/docs" },
+    { "name": "Team Notes", "path": "~/Documents/team-notes" }
+  ]
+}
