@@ -9,7 +9,7 @@
 <body>
   <aside class="sidebar">
     <header class="sidebar-head">
-      <span class="wordmark">Nubsidian</span>
+      <button class="wordmark" id="homeBtn" type="button" title="Go to dashboard">Nubsidian</button>
       <div class="head-actions">
         <button class="add-root-btn" id="collapseAllBtn" type="button" title="Collapse/expand all roots">↕</button>
         <button class="add-root-btn" id="addRootBtn" type="button" title="Add a root directory">+</button>
@@ -22,12 +22,16 @@
   <main class="pane">
     <header class="pane-head" id="paneHead" hidden>
       <span class="crumb" id="crumb"></span>
-      <span class="save-state" id="saveState"></span>
+      <span class="pane-meta">
+        <span class="word-count" id="wordCount"></span>
+        <span class="save-state" id="saveState"></span>
+      </span>
     </header>
 
     <section id="empty" class="empty">
       <div class="dashboard">
-        <p class="dashboard-hint">Select a document from the sidebar, or manage your roots below.</p>
+        <p class="dashboard-hint" id="dashboardHint"></p>
+        <div class="recent-list" id="recentList" hidden></div>
         <div class="root-grid" id="rootGrid"></div>
       </div>
     </section>
@@ -44,7 +48,15 @@
     </div>
   </main>
 
-  <div id="ctxMenu" class="ctx-menu" hidden></div>
+  <div id="actionMenu" class="action-menu" hidden></div>
+
+  <div id="paletteOverlay" class="palette-overlay" hidden>
+    <div class="palette">
+      <input type="text" id="paletteInput" class="palette-input" placeholder="Jump to a file…"
+             autocomplete="off" spellcheck="false" />
+      <div id="paletteList" class="palette-list"></div>
+    </div>
+  </div>
 
   <div id="modalOverlay" class="modal-overlay" hidden>
     <div class="modal">

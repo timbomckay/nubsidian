@@ -46,11 +46,30 @@ const config = await readConfig();
 const PORT = config.port ?? 4321;
 const rawRoots = config.roots ?? []; // unexpanded, as written in config.json
 
+// URL-friendly identifier for a root, e.g. "Team Notes" -> "team-notes",
+// used as the first path segment of a document's URL. Uniqueness is
+// enforced against the roots already assigned a slug (existingSlugs).
+function slugify(name, existingSlugs) {
+  const base =
+    name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "root";
+  let slug = base;
+  let n = 2;
+  while (existingSlugs.has(slug)) slug = `${base}-${n++}`;
+  existingSlugs.add(slug);
+  return slug;
+}
+
+const rootSlugs = new Set();
 const roots = rawRoots.map((r, i) => ({
   id: String(i),
   name: r.name ?? path.basename(r.path),
   path: path.resolve(expandHome(r.path)),
   favorite: !!r.favorite,
+  slug: slugify(r.name ?? path.basename(r.path), rootSlugs),
 }));
 let nextRootId = roots.length; // monotonic, so ids stay unique after removals
 
@@ -113,7 +132,13 @@ async function addRoot(name, rawPath, { create = false } = {}) {
     throw httpError(400, `Not a directory: ${rawPath}`);
   }
 
-  const root = { id: String(nextRootId++), name, path: resolved, favorite: false };
+  const root = {
+    id: String(nextRootId++),
+    name,
+    path: resolved,
+    favorite: false,
+    slug: slugify(name, rootSlugs),
+  };
   roots.push(root);
   rawRoots.push({ name, path: rawPath });
   await writeConfig();
@@ -136,7 +161,7 @@ app.register(fastifyStatic, {
 app.get("/api/roots", async () => ({
   roots: [...roots]
     .sort((a, b) => Number(b.favorite) - Number(a.favorite))
-    .map(({ id, name, path: p, favorite }) => ({ id, name, path: p, favorite })),
+    .map(({ id, name, path: p, favorite, slug }) => ({ id, name, path: p, favorite, slug })),
 }));
 
 // One level of a directory tree (the UI lazy-loads on expand)
@@ -169,6 +194,45 @@ app.get("/api/tree", async (req) => {
         : 1,
   );
   return { items };
+});
+
+// Flat recursive file listing for the quick switcher (⌘K). Directories are
+// omitted — it's a jump-to-file palette, not a tree. Capped so a
+// misconfigured root (e.g. someone's home directory) can't melt the browser.
+app.get("/api/files", async (req) => {
+  const { root: rootId } = req.query;
+  const { abs } = resolveSafe(rootId, "");
+  const files = [];
+  const MAX_FILES = 5000;
+
+  async function walk(dir, rel) {
+    if (files.length >= MAX_FILES) return;
+    let entries;
+    try {
+      entries = await fs.readdir(dir, { withFileTypes: true });
+    } catch {
+      return; // unreadable subdir — skip rather than fail the whole listing
+    }
+    for (const e of entries) {
+      if (files.length >= MAX_FILES) return;
+      if (e.name.startsWith(".") || e.name === "node_modules") continue;
+      const childRel = rel ? `${rel}/${e.name}` : e.name;
+      if (e.isDirectory()) {
+        await walk(path.join(dir, e.name), childRel);
+      } else {
+        const ext = path.extname(e.name).toLowerCase();
+        if (!VISIBLE.has(ext)) continue;
+        files.push({
+          type: EDITABLE.has(ext) ? "markdown" : VIEWABLE.has(ext) ? "html" : "image",
+          name: e.name,
+          path: childRel,
+        });
+      }
+    }
+  }
+
+  await walk(abs, "");
+  return { files };
 });
 
 // Read a file. Images are binary, so this returns metadata only — the
@@ -228,6 +292,24 @@ app.post("/api/create", async (req) => {
   return { ok: true };
 });
 
+// Rename (or move within the same root) a file or folder. Both ends go
+// through resolveSafe, so neither side can escape the root.
+app.post("/api/rename", async (req) => {
+  const { root: rootId, from, to } = req.body;
+  if (!from || !to) throw httpError(400, "from and to are required");
+  const { abs: absFrom } = resolveSafe(rootId, from);
+  const { abs: absTo } = resolveSafe(rootId, to);
+  const stat = await fs.stat(absFrom);
+  if (stat.isFile() && !VISIBLE.has(path.extname(absTo).toLowerCase())) {
+    throw httpError(400, "New name must keep a supported extension");
+  }
+  if (await fs.stat(absTo).catch(() => null)) {
+    throw httpError(409, "Something with that name already exists");
+  }
+  await fs.rename(absFrom, absTo);
+  return { ok: true };
+});
+
 // Delete a file or folder (recursively). The root's top level itself can't be
 // deleted this way — use DELETE /api/roots/:id to remove a root instead.
 app.delete("/api/entry", async (req) => {
@@ -244,7 +326,7 @@ app.post("/api/roots", async (req) => {
   const { name, path: rawPath, create } = req.body ?? {};
   if (!name || !rawPath) throw httpError(400, "name and path are required");
   const root = await addRoot(name, rawPath, { create: !!create });
-  return { id: root.id, name: root.name };
+  return { id: root.id, name: root.name, slug: root.slug };
 });
 
 // Toggle a root's favorite flag, persisted to config.json.
@@ -268,6 +350,7 @@ app.delete("/api/roots/:id", async (req) => {
   rawRoots.splice(idx, 1);
   await writeConfig();
   unwatchRoot(removed);
+  rootSlugs.delete(removed.slug);
   return { ok: true };
 });
 
@@ -322,6 +405,20 @@ function unwatchRoot(root) {
 for (const root of roots) watchRoot(root);
 
 // ---------------------------------------------------------------------------
+// Document URLs look like /<root-slug>/<relative path>, e.g. /notes/todo.md
+// (see slugify() above and the client's routing in app.js). There's no
+// server-side route per document — the client reads location.pathname and
+// fetches through /api/file — so any GET that isn't a known static asset or
+// an /api/* call falls through here to the SPA shell, which does the actual
+// routing once loaded. /api/* misses stay a real 404 instead.
+app.setNotFoundHandler((req, reply) => {
+  if (req.method !== "GET" || req.url.startsWith("/api/")) {
+    reply.status(404).send({ error: "Not found" });
+    return;
+  }
+  reply.sendFile("index.html");
+});
+
 app.setErrorHandler((err, req, reply) => {
   reply.status(err.statusCode ?? 500).send({ error: err.message });
 });
