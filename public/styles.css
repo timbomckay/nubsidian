@@ -7,6 +7,10 @@
   --sidebar-dim: #79839a;
   --accent: #3e7c59;
   --accent-soft: #e2ede7;
+  --hl-bad: #f0b4ae;
+  --hl-neutral: #f5d55c;
+  --hl-good: #b8e0a8;
+  --hl-great: #a9d3f0;
   --rule: #e4e2da;
   --mono: ui-monospace, "Cascadia Code", "SF Mono", Consolas, monospace;
   --sans: -apple-system, "Segoe UI", system-ui, sans-serif;
@@ -255,11 +259,156 @@ body {
 }
 .add-root-card:hover { border-color: var(--accent); color: var(--accent); }
 
-.editor-wrap { flex: 1; overflow-y: auto; }
+.editor-wrap { flex: 1; overflow-y: auto; position: relative; }
 .editor {
   max-width: 760px;
   margin: 0 auto;
-  padding: 40px 32px 120px;
+  padding: 40px 32px 120px 56px;
+}
+
+/* --------------------------------------------------------------- bubble menu */
+.bubble-menu {
+  display: flex;
+  gap: 2px;
+  background: var(--ink);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 8px 24px rgba(20, 24, 32, 0.25);
+}
+.bubble-btn {
+  font: inherit;
+  font-size: 13px;
+  color: #d8dbe0;
+  background: none;
+  border: 0;
+  border-radius: 5px;
+  padding: 5px 9px;
+  cursor: pointer;
+  line-height: 1;
+}
+.bubble-btn:hover { background: rgba(255, 255, 255, 0.12); color: #fff; }
+.bubble-btn.is-active { background: var(--accent); color: #fff; }
+.bubble-btn-bold { font-weight: 700; }
+.bubble-btn-italic { font-style: italic; }
+.bubble-btn-strike { text-decoration: line-through; }
+.bubble-btn-code { font-family: var(--mono); font-size: 11px; }
+.bubble-hl {
+  width: 16px;
+  height: 16px;
+  align-self: center;
+  border: 0;
+  border-radius: 50%;
+  padding: 0;
+  margin: 0 2px;
+  cursor: pointer;
+}
+.bubble-hl:hover { box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.35); }
+.bubble-hl.is-active { box-shadow: 0 0 0 2px #fff; }
+.bubble-hl-bad { background: var(--hl-bad); }
+.bubble-hl-neutral { background: var(--hl-neutral); }
+.bubble-hl-good { background: var(--hl-good); }
+.bubble-hl-great { background: var(--hl-great); }
+
+/* --------------------------------------------------------------- drag handle */
+.drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: #b3b7be;
+  cursor: grab;
+  border-radius: 4px;
+}
+.drag-handle svg { width: 15px; height: 15px; }
+.drag-handle:hover { background: var(--accent-soft); color: var(--accent); }
+.drag-handle:active { cursor: grabbing; }
+
+/* ---------------------------------------------------------------- slash menu */
+.slash-menu {
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(20, 24, 32, 0.18);
+  padding: 4px;
+  min-width: 180px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+.slash-item {
+  display: block;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  font-size: 13px;
+  border: 0;
+  background: none;
+  padding: 7px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.slash-item:hover, .slash-item.is-selected { background: var(--accent-soft); color: var(--accent); }
+
+/* ------------------------------------------------------------------- toc */
+/* Collapses to a strip of ticks and expands to a readable list on hover,
+   like Tiptap's own docs nav — anchored to the right edge so it only grows
+   leftward, and the ticks stay in the same flow so the fade-in doesn't shift
+   layout. */
+.toc-panel {
+  position: fixed;
+  top: 96px;
+  right: 24px;
+  max-height: calc(100vh - 140px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 8px 0;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.toc-panel:not([hidden]) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+.toc-panel:hover {
+  background: #fff;
+  border-color: var(--rule);
+  box-shadow: 0 12px 32px rgba(20, 24, 32, 0.12);
+  align-items: stretch;
+  gap: 1px;
+}
+.toc-item {
+  font: inherit;
+  font-size: 12px;
+  text-align: left;
+  color: transparent;
+  background: var(--rule);
+  border: 0;
+  border-radius: 2px;
+  width: calc(22px - (var(--toc-level, 1) - 1) * 4px);
+  height: 3px;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: width 0.15s ease, height 0.15s ease, color 0.1s ease, background 0.15s ease, padding 0.15s ease;
+}
+.toc-item.is-active { background: var(--accent); }
+.toc-panel:hover .toc-item {
+  width: 200px;
+  height: auto;
+  color: #9a9ea6;
+  background: none;
+  padding: 4px 6px 4px calc(6px + (var(--toc-level, 1) - 1) * 10px);
+}
+.toc-panel:hover .toc-item:hover { color: var(--ink); background: var(--accent-soft); border-radius: 4px; }
+.toc-panel:hover .toc-item.is-active { color: var(--accent); font-weight: 600; }
+
+@media (max-width: 1100px) {
+  .toc-panel { display: none; }
 }
 
 .html-view { flex: 1; border: 0; background: #fff; }
@@ -290,6 +439,9 @@ body {
   font-size: 17px;
   line-height: 1.65;
 }
+/* :focus-visible below has equal specificity to .ProseMirror and comes later
+   in the file, so it wins the outline:none/2px tie-break without this. */
+.ProseMirror:focus-visible { outline: none; }
 .ProseMirror h1, .ProseMirror h2, .ProseMirror h3 {
   font-family: var(--sans);
   letter-spacing: -0.01em;
@@ -299,6 +451,15 @@ body {
 .ProseMirror h2 { font-size: 22px; margin: 1.2em 0 0.4em; }
 .ProseMirror h3 { font-size: 18px; margin: 1.1em 0 0.3em; }
 .ProseMirror a { color: var(--accent); }
+.ProseMirror mark {
+  background: var(--hl-neutral);
+  color: var(--ink);
+  padding: 0.05em 0.1em;
+  border-radius: 2px;
+}
+.ProseMirror mark[data-variant="bad"] { background: var(--hl-bad); }
+.ProseMirror mark[data-variant="good"] { background: var(--hl-good); }
+.ProseMirror mark[data-variant="great"] { background: var(--hl-great); }
 .ProseMirror code {
   font-family: var(--mono);
   font-size: 0.85em;
@@ -314,6 +475,16 @@ body {
   overflow-x: auto;
 }
 .ProseMirror pre code { background: none; padding: 0; }
+.hljs-comment, .hljs-quote { color: var(--sidebar-dim); font-style: italic; }
+.hljs-keyword, .hljs-operator, .hljs-selector-tag { color: #c793e6; }
+.hljs-string, .hljs-attr, .hljs-regexp, .hljs-addition { color: #9fca7a; }
+.hljs-number, .hljs-literal, .hljs-deletion { color: #e0a75e; }
+.hljs-title, .hljs-title.function_, .hljs-section { color: #6fb3e0; }
+.hljs-built_in, .hljs-type, .hljs-class .hljs-title { color: #5cbdcb; }
+.hljs-variable, .hljs-template-variable, .hljs-name, .hljs-tag { color: #e37c88; }
+.hljs-attribute, .hljs-meta { color: #e0a75e; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: 700; }
 .ProseMirror blockquote {
   border-left: 3px solid var(--accent);
   margin-left: 0;
@@ -323,6 +494,57 @@ body {
 .ProseMirror ul[data-type="taskList"] { list-style: none; padding-left: 4px; }
 .ProseMirror ul[data-type="taskList"] li { display: flex; gap: 8px; }
 .ProseMirror hr { border: 0; border-top: 1px solid var(--rule); margin: 2em 0; }
+
+/* ------------------------------------------------------------ admonition */
+/* Grid rather than absolute-positioned chrome + padding-left on content:
+   title and body are both plain children of the same grid cell, so they
+   share one left edge by construction instead of two numbers (an offset on
+   the chrome, a padding-left on content) that have to be kept in sync by
+   hand. */
+.admonition {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--rule);
+  border-radius: 8px;
+  margin: 1.2em 0;
+  padding: 12px 14px;
+}
+.admonition-chrome { padding-top: 3px; }
+.admonition-type-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.admonition-type-dot[data-type="note"] { background: #4a90c4; }
+.admonition-type-dot[data-type="tip"] { background: var(--accent); }
+.admonition-type-dot[data-type="warning"] { background: #c98a2e; }
+.admonition-type-dot[data-type="danger"] { background: #c0392b; }
+.admonition-content { min-width: 0; }
+.admonition-title {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 14px;
+  min-height: 1.2em;
+  outline: none;
+  margin-bottom: 4px;
+}
+.admonition-title:empty::before { content: "Title"; color: #9a9ea6; font-weight: 400; }
+.admonition-body { font-size: 16px; }
+.admonition-body > *:first-child { margin-top: 0; }
+.admonition-body > *:last-child { margin-bottom: 0; }
+.admonition[data-admonition-type="note"] { border-left-color: #4a90c4; background: #eef5fb; }
+.admonition[data-admonition-type="note"] .admonition-title { color: #2f5f85; }
+.admonition[data-admonition-type="tip"] { border-left-color: var(--accent); background: var(--accent-soft); }
+.admonition[data-admonition-type="tip"] .admonition-title { color: var(--accent); }
+.admonition[data-admonition-type="warning"] { border-left-color: #c98a2e; background: #fdf3e2; }
+.admonition[data-admonition-type="warning"] .admonition-title { color: #8f5f1a; }
+.admonition[data-admonition-type="danger"] { border-left-color: #c0392b; background: #fbeaea; }
+.admonition[data-admonition-type="danger"] .admonition-title { color: #a5311f; }
 
 /* -------------------------------------------------------------- ctx menu */
 .ctx-menu {

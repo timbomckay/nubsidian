@@ -20,6 +20,7 @@ const modalMessage = $("modalMessage");
 const modalInput = $("modalInput");
 const modalCancel = $("modalCancel");
 const modalOk = $("modalOk");
+const tocPanel = $("tocPanel");
 
 const ICONS = {
   dir: `<svg class="icon" viewBox="0 0 16 16" fill="currentColor"><path d="M1.5 3A1.5 1.5 0 0 1 3 1.5h3l1.5 2H13A1.5 1.5 0 0 1 14.5 5v7A1.5 1.5 0 0 1 13 13.5H3A1.5 1.5 0 0 1 1.5 12V3z"/></svg>`,
@@ -136,6 +137,32 @@ const showPrompt = (message, defaultValue = "") =>
 const showConfirm = (message, { okLabel = "Delete", danger = true } = {}) =>
   showModal({ message, okLabel, danger });
 const showAlert = (message) => showModal({ message, showCancel: false });
+
+// The TipTap bundle's bubble-menu link button needs the modal (no native
+// prompt() allowed), but it lives in a separate bundle loaded before this
+// script defines showPrompt — fine, since it's only called later on click.
+window.showPrompt = showPrompt;
+
+// ------------------------------------------------------------------- toc
+// H1 is redundant with the doc title and h4+ is too granular for a nav —
+// matches the "on this page" convention most docs sites (Docusaurus,
+// Mintlify) use: h2/h3 only.
+function renderToc(items) {
+  const headings = items.filter(
+    (item) => item.textContent.trim() && item.originalLevel >= 2 && item.originalLevel <= 3,
+  );
+  tocPanel.hidden = headings.length < 2;
+  tocPanel.innerHTML = "";
+  for (const item of headings) {
+    const link = document.createElement("button");
+    link.type = "button";
+    link.className = "toc-item" + (item.isActive ? " is-active" : "");
+    link.style.setProperty("--toc-level", item.originalLevel - 1);
+    link.textContent = item.textContent;
+    link.addEventListener("click", () => editor?.scrollToHeading(item.id));
+    tocPanel.appendChild(link);
+  }
+}
 
 // ------------------------------------------------------------ root collapse
 const COLLAPSE_KEY = "nubsidian.collapsedRoots";
@@ -382,6 +409,7 @@ async function openFile(rootId, relPath, rowEl) {
   editorWrap.hidden = true;
   htmlView.hidden = true;
   imgView.hidden = true;
+  tocPanel.hidden = true;
 
   if (kind === "markdown") {
     editorWrap.hidden = false;
@@ -391,6 +419,7 @@ async function openFile(rootId, relPath, rowEl) {
       element: $("editor"),
       markdown: content,
       onUpdate: scheduleSave,
+      onTocUpdate: renderToc,
     });
     setSaveState("saved");
     editor.focus();
@@ -414,6 +443,7 @@ function closeCurrent() {
   editorWrap.hidden = true;
   htmlView.hidden = true;
   imgView.hidden = true;
+  tocPanel.hidden = true;
   paneHead.hidden = true;
   emptyEl.hidden = false;
 }
