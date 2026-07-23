@@ -1,0 +1,69 @@
+name: Build production branch
+
+# On every push to main, assemble a self-contained, ready-to-run build and
+# publish it to the `production` branch. That branch has NO node_modules and
+# needs NO `npm install` — the server and all its deps are bundled into a
+# single file. Pull it and run `node server.js` (or `npm start`).
+#
+# History is linear (a normal commit each build, never a force-push), so
+# consumers can `git pull` for the latest instead of having to reset.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # allow manual runs from the Actions tab
+
+# Needed to push the production branch back to the repo.
+permissions:
+  contents: write
+
+# If several pushes land quickly, only the latest needs to publish.
+concurrency:
+  group: production-branch
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out main
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install build tooling
+        run: npm ci
+
+      - name: Assemble dist/
+        run: npm run build:production
+
+      - name: Publish dist/ to production branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Check out the existing production branch into a worktree so its
+          # history is preserved; create it as an orphan the first time.
+          if git ls-remote --exit-code --heads origin production >/dev/null 2>&1; then
+            git fetch origin production
+            git worktree add ../out production
+          else
+            git worktree add --orphan -b production ../out
+          fi
+
+          # Replace the worktree contents with the fresh build. --delete drops
+          # files that no longer exist in dist/; keep .git.
+          rsync -a --delete --exclude '.git' dist/ ../out/
+
+          cd ../out
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish."
+          else
+            git commit -m "Production build from ${GITHUB_SHA}"
+            git push origin production
+          fi

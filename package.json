@@ -6,6 +6,7 @@
   "description": "Local multi-root markdown editor and HTML viewer. Config-driven, no database.",
   "scripts": {
     "build": "node build.js",
+    "build:production": "node build-production.js",
     "start": "node server.js",
     "dev": "node build.js && node server.js"
   },
