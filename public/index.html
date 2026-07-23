@@ -4,16 +4,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Nubsidian</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <aside class="sidebar">
     <header class="sidebar-head">
-      <button class="wordmark" id="homeBtn" type="button" title="Go to dashboard">Nubsidian</button>
+      <button class="wordmark" id="homeBtn" type="button" title="Go to dashboard">
+        <img src="/logo.svg" alt="" class="wordmark-logo" width="30" height="30" />
+        <img src="/wordmark.svg" alt="Nubsidian" class="wordmark-text" />
+      </button>
       <div class="head-actions">
+        <span class="status" id="status" hidden title="Live updates disconnected">●</span>
         <button class="add-root-btn" id="collapseAllBtn" type="button" title="Collapse/expand all roots">↕</button>
         <button class="add-root-btn" id="addRootBtn" type="button" title="Add a root directory">+</button>
-        <span class="status" id="status" title="Watching for file changes">●</span>
       </div>
     </header>
     <nav id="tree" class="tree" aria-label="Documents"></nav>

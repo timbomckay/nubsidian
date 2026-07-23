@@ -1,12 +1,12 @@
 /* ------------------------------------------------------------------ tokens */
 :root {
-  --ink: #23272e;
+  --ink: #24271f;
   --paper: #fafaf7;
-  --sidebar: #1e2430;
-  --sidebar-ink: #c7cdd8;
-  --sidebar-dim: #79839a;
-  --accent: #3e7c59;
-  --accent-soft: #e2ede7;
+  --sidebar: #1a1c18;
+  --sidebar-ink: #ccd2c8;
+  --sidebar-dim: #838b7d;
+  --accent: #468735;
+  --accent-soft: #e7f0dc;
   --hl-bad: #f0b4ae;
   --hl-neutral: #f5d55c;
   --hl-good: #b8e0a8;
@@ -37,36 +37,39 @@ body {
 }
 .sidebar-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
-  padding: 14px 16px 10px;
+  padding: 16px 14px 12px 16px;
 }
 .wordmark {
-  font-family: var(--mono);
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: none;
   border: none;
   padding: 0;
   cursor: pointer;
+  min-width: 0;
 }
-.wordmark:hover { color: var(--accent-soft); }
-.head-actions { display: flex; align-items: center; gap: 10px; }
-.status { font-size: 9px; color: var(--sidebar-dim); }
-.status.live { color: #6fbf8f; }
+.wordmark-logo { display: block; flex: none; }
+.wordmark-text { display: block; height: 22px; width: auto; }
+.head-actions { display: flex; align-items: center; gap: 8px; }
+/* only shown when the SSE connection drops — no light means all is well */
+.status { font-size: 9px; color: #d9a05b; }
+#collapseAllBtn { opacity: 0; transition: opacity 0.15s; }
+.sidebar-head:hover #collapseAllBtn,
+#collapseAllBtn:focus-visible { opacity: 1; }
 
 .add-root-btn {
   font-family: var(--mono);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1;
   color: var(--sidebar-ink);
   background: transparent;
-  border: 1px solid #384056;
-  border-radius: 4px;
-  width: 18px;
-  height: 18px;
+  border: 1px solid #3b4136;
+  border-radius: 5px;
+  width: 22px;
+  height: 22px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -159,7 +162,7 @@ body {
 .action-btn.starred { display: flex; color: #e8b64a; }
 .action-btn:hover {
   background: rgba(255, 255, 255, 0.12);
-  border-color: #384056;
+  border-color: #3b4136;
   color: #fff;
 }
 .row.active .action-btn { color: rgba(255, 255, 255, 0.85); }
@@ -177,16 +180,16 @@ body {
   border-bottom: 1px solid var(--rule);
   background: #fff;
 }
-.crumb { font-family: var(--mono); font-size: 12px; color: #6b6f76; }
+.crumb { font-family: var(--mono); font-size: 12px; color: #6e716a; }
 .pane-meta { display: flex; align-items: baseline; gap: 14px; flex: none; }
-.word-count { font-family: var(--mono); font-size: 11px; color: #9a9ea6; }
+.word-count { font-family: var(--mono); font-size: 11px; color: #9b9e96; }
 .save-state { font-family: var(--mono); font-size: 11px; color: var(--accent); }
 .save-state.dirty { color: #b0803a; }
 .save-state.error { color: #c0392b; }
 
 .empty {
   margin: auto;
-  color: #9a9ea6;
+  color: #9b9e96;
   font-size: 14px;
   text-align: center;
   line-height: 1.7;
@@ -219,7 +222,7 @@ body {
   font-size: 10px;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #9a9ea6;
+  color: #9b9e96;
   padding: 0 10px 6px;
 }
 .recent-item {
@@ -247,7 +250,7 @@ body {
   white-space: nowrap;
   font-family: var(--mono);
   font-size: 11px;
-  color: #9a9ea6;
+  color: #9b9e96;
 }
 .recent-item .r-root {
   flex: none;
@@ -255,7 +258,7 @@ body {
   font-size: 9px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #9a9ea6;
+  color: #9b9e96;
   border: 1px solid var(--rule);
   border-radius: 99px;
   padding: 2px 7px;
@@ -287,7 +290,7 @@ body {
 }
 .root-card .star-btn {
   display: flex;
-  color: #c8ccd2;
+  color: #c8ccc3;
   width: 20px;
   height: 20px;
   font-size: 14px;
@@ -297,7 +300,7 @@ body {
 .root-card-path {
   font-family: var(--mono);
   font-size: 11px;
-  color: #9a9ea6;
+  color: #9b9e96;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -318,7 +321,7 @@ body {
 .add-root-card {
   border: 1px dashed var(--rule);
   background: none;
-  color: #9a9ea6;
+  color: #9b9e96;
   font: inherit;
   font-size: 13px;
   cursor: pointer;
@@ -347,7 +350,7 @@ body {
 .bubble-btn {
   font: inherit;
   font-size: 13px;
-  color: #d8dbe0;
+  color: #d6dad1;
   background: none;
   border: 0;
   border-radius: 5px;
@@ -385,7 +388,7 @@ body {
   justify-content: center;
   width: 28px;
   height: 28px;
-  color: #b3b7be;
+  color: #b4b8ae;
   cursor: grab;
   border-radius: 4px;
 }
@@ -469,7 +472,7 @@ body {
 .toc-panel:hover .toc-item {
   width: 200px;
   height: auto;
-  color: #9a9ea6;
+  color: #9b9e96;
   background: none;
   padding: 4px 6px 4px calc(6px + (var(--toc-level, 1) - 1) * 10px);
 }
@@ -570,50 +573,50 @@ body {
    share one left edge by construction instead of two numbers (an offset on
    the chrome, a padding-left on content) that have to be kept in sync by
    hand. */
+/* Quiet editorial aside: no fill, no box — a thin colored rule and a
+   small-caps label. --adm is set per type on the container so the rule,
+   dot, and label all pull from one place. */
 .admonition {
+  --adm: var(--sidebar-dim);
   display: grid;
   grid-template-columns: auto 1fr;
-  column-gap: 10px;
-  border: 1px solid var(--rule);
-  border-left: 4px solid var(--rule);
-  border-radius: 8px;
-  margin: 1.2em 0;
-  padding: 12px 14px;
+  column-gap: 9px;
+  border-left: 2px solid var(--adm);
+  margin: 1.6em 0;
+  padding: 2px 0 2px 18px;
 }
 .admonition-chrome { padding-top: 3px; }
 .admonition-type-dot {
-  width: 14px;
-  height: 14px;
+  display: block;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   border: 0;
   padding: 0;
   cursor: pointer;
+  background: var(--adm);
 }
-.admonition-type-dot[data-type="note"] { background: #4a90c4; }
-.admonition-type-dot[data-type="tip"] { background: var(--accent); }
-.admonition-type-dot[data-type="warning"] { background: #c98a2e; }
-.admonition-type-dot[data-type="danger"] { background: #c0392b; }
+.admonition-type-dot:hover { box-shadow: 0 0 0 3px var(--accent-soft); }
 .admonition-content { min-width: 0; }
 .admonition-title {
   font-family: var(--sans);
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 650;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--adm);
   min-height: 1.2em;
   outline: none;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
-.admonition-title:empty::before { content: "Title"; color: #9a9ea6; font-weight: 400; }
+.admonition-title:empty::before { content: "Title"; color: #9b9e96; font-weight: 400; }
 .admonition-body { font-size: 16px; }
 .admonition-body > *:first-child { margin-top: 0; }
 .admonition-body > *:last-child { margin-bottom: 0; }
-.admonition[data-admonition-type="note"] { border-left-color: #4a90c4; background: #eef5fb; }
-.admonition[data-admonition-type="note"] .admonition-title { color: #2f5f85; }
-.admonition[data-admonition-type="tip"] { border-left-color: var(--accent); background: var(--accent-soft); }
-.admonition[data-admonition-type="tip"] .admonition-title { color: var(--accent); }
-.admonition[data-admonition-type="warning"] { border-left-color: #c98a2e; background: #fdf3e2; }
-.admonition[data-admonition-type="warning"] .admonition-title { color: #8f5f1a; }
-.admonition[data-admonition-type="danger"] { border-left-color: #c0392b; background: #fbeaea; }
-.admonition[data-admonition-type="danger"] .admonition-title { color: #a5311f; }
+.admonition[data-admonition-type="note"] { --adm: #3f6f99; }
+.admonition[data-admonition-type="tip"] { --adm: var(--accent); }
+.admonition[data-admonition-type="warning"] { --adm: #a1751f; }
+.admonition[data-admonition-type="danger"] { --adm: #b0483f; }
 
 /* ----------------------------------------------------------- action menu */
 .action-menu {
@@ -657,7 +660,7 @@ body {
   width: 580px;
   max-width: calc(100vw - 40px);
   background: var(--sidebar);
-  border: 1px solid #384056;
+  border: 1px solid #3b4136;
   border-radius: 12px;
   box-shadow: 0 24px 70px rgba(10, 13, 20, 0.5);
   overflow: hidden;
@@ -724,7 +727,7 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--sidebar-dim);
-  border: 1px solid #384056;
+  border: 1px solid #3b4136;
   border-radius: 99px;
   padding: 2px 7px;
 }

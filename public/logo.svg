@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <!-- Definitions for gradients and shadows -->
+  <defs>
+    <!-- Drop shadow for the outer white stroke to pop from dark backgrounds -->
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-opacity="0.3"/>
+    </filter>
+
+    <!-- Gradients for the rock body sections -->
+    <linearGradient id="mainBodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#9ce681"/>
+      <stop offset="50%" stop-color="#70c454"/>
+      <stop offset="100%" stop-color="#468735"/>
+    </linearGradient>
+
+    <linearGradient id="highlightGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c3f5ae" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#9ce681" stop-opacity="0.1"/>
+    </linearGradient>
+
+    <linearGradient id="shadowGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3d752e"/>
+      <stop offset="100%" stop-color="#234719"/>
+    </linearGradient>
+  </defs>
+
+  <!-- MAIN CHARACTER GROUP -->
+  <g filter="url(#shadow)">
+
+    <!-- 1. OUTER WHITE BORDER / OUTLINE -->
+    <path d="M 210,65
+             C 240,75 270,110 295,130
+             C 320,150 350,195 340,230
+             C 330,265 295,300 270,335
+             C 245,370 175,350 140,335
+             C 105,320 85,260 95,215
+             C 105,170 145,150 160,115
+             C 175,80 185,60 210,65 Z"
+          fill="none" stroke="#ffffff" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- 2. DARK GREEN INNER OUTLINE -->
+    <path d="M 210,65
+             C 240,75 270,110 295,130
+             C 320,150 350,195 340,230
+             C 330,265 295,300 270,335
+             C 245,370 175,350 140,335
+             C 105,320 85,260 95,215
+             C 105,170 145,150 160,115
+             C 175,80 185,60 210,65 Z"
+          fill="url(#mainBodyGrad)" stroke="#1d3616" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- 5. BASE SHADOW OVERLAYS (Bottom and Left facets) -->
+    <path d="M 140,335 C 105,320 85,260 95,215 C 105,170 145,150 160,115 C 150,160 120,220 145,280 C 160,310 190,320 220,330 C 200,335 160,340 140,335 Z" fill="url(#shadowGrad)" opacity="0.4"/>
+    <path d="M 340,230 C 330,265 295,300 270,335 C 245,370 185,345 220,320 C 260,290 310,270 340,230 Z" fill="url(#shadowGrad)" opacity="0.3"/>
+
+    <!-- 6. TOP LIGHT HIGHLIGHTS (Bright Green Facets) -->
+    <path d="M 210,65 C 230,70 250,90 265,110 C 230,100 190,95 175,120 C 170,100 185,75 210,65 Z" fill="url(#highlightGrad)"/>
+    <path d="M 265,110 C 285,125 310,155 315,180 C 290,160 260,140 240,165 C 245,135 255,120 265,110 Z" fill="url(#highlightGrad)"/>
+
+    <!-- 7. PURPLE SPOTS / OBSIDIAN INCLUSIONS -->
+    <!-- Top spot -->
+    <ellipse cx="190" cy="110" rx="8" ry="12" transform="rotate(30 190 110)" fill="#311d4d"/>
+    <circle cx="185" cy="130" r="4" fill="#311d4d"/>
+    <!-- Bottom left spot -->
+    <ellipse cx="140" cy="270" rx="10" ry="18" transform="rotate(-20 140 270)" fill="#311d4d"/>
+    <!-- Bottom right spot -->
+    <ellipse cx="290" cy="285" rx="14" ry="10" transform="rotate(15 290 285)" fill="#311d4d"/>
+    <!-- Small cluster dots -->
+    <circle cx="295" cy="225" r="4" fill="#1d3616"/>
+    <circle cx="305" cy="235" r="3" fill="#1d3616"/>
+    <circle cx="270" cy="315" r="4" fill="#1d3616"/>
+
+    <!-- 8. THE FACE -->
+    <!-- Left Eye -->
+    <ellipse cx="172" cy="195" rx="40" ry="44" fill="#ffffff" stroke="#1d3616" stroke-width="8"/>
+    <circle cx="180" cy="195" r="19" fill="#000000"/>
+    <circle cx="168" cy="183" r="6.5" fill="#ffffff"/> <!-- Pupil highlight -->
+
+    <!-- Right Eye -->
+    <ellipse cx="268" cy="190" rx="40" ry="44" fill="#ffffff" stroke="#1d3616" stroke-width="8"/>
+    <circle cx="260" cy="190" r="19" fill="#000000"/>
+    <circle cx="248" cy="178" r="6.5" fill="#ffffff"/> <!-- Pupil highlight -->
+
+    <!-- Happy Smile -->
+    <path d="M 205,248 C 210,262 230,262 235,248" fill="none" stroke="#1d3616" stroke-width="6" stroke-linecap="round"/>
+
+  </g>
+</svg>

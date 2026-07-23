@@ -665,8 +665,8 @@ window.addEventListener("beforeunload", () => {
 
 // ------------------------------------------------------- live updates (SSE)
 const events = new EventSource("/api/events");
-events.onopen = () => $("status").classList.add("live");
-events.onerror = () => $("status").classList.remove("live");
+events.onopen = () => ($("status").hidden = true);
+events.onerror = () => ($("status").hidden = false);
 events.onmessage = async (msg) => {
   const { event, root, path } = JSON.parse(msg.data);
 
