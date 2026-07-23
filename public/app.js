@@ -1018,6 +1018,37 @@ async function addRootFlow() {
 
 $("addRootBtn").addEventListener("click", addRootFlow);
 
+// ------------------------------------------------------------------- theme
+// Three modes cycled by the header button: system → light → dark. Only the
+// mode is persisted; "system" is resolved against the OS preference (and
+// re-resolved live via matchMedia) into the concrete data-theme the CSS reads.
+// The inline script in index.html applies the same resolution before first
+// paint to avoid a flash — this just keeps it in sync and drives the toggle.
+const THEME_KEY = "nubsidian.theme";
+const THEME_MODES = ["system", "light", "dark"];
+const THEME_GLYPH = { system: "◐", light: "☀", dark: "☾" };
+const themeMedia = window.matchMedia("(prefers-color-scheme: dark)");
+let themeMode = localStorage.getItem(THEME_KEY) || "system";
+
+function applyTheme() {
+  const dark = themeMode === "dark" || (themeMode === "system" && themeMedia.matches);
+  document.documentElement.dataset.theme = dark ? "dark" : "light";
+  const btn = $("themeBtn");
+  btn.textContent = THEME_GLYPH[themeMode];
+  btn.title = `Theme: ${themeMode} (click for ${
+    THEME_MODES[(THEME_MODES.indexOf(themeMode) + 1) % THEME_MODES.length]
+  })`;
+}
+applyTheme();
+themeMedia.addEventListener("change", () => {
+  if (themeMode === "system") applyTheme();
+});
+$("themeBtn").addEventListener("click", () => {
+  themeMode = THEME_MODES[(THEME_MODES.indexOf(themeMode) + 1) % THEME_MODES.length];
+  localStorage.setItem(THEME_KEY, themeMode);
+  applyTheme();
+});
+
 $("collapseAllBtn").addEventListener("click", () => {
   const labels = [...treeEl.querySelectorAll(".root-label")];
   const anyExpanded = labels.some((l) => !l.classList.contains("collapsed"));

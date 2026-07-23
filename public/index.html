@@ -6,6 +6,18 @@
   <title>Nubsidian</title>
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <link rel="stylesheet" href="/styles.css" />
+  <!-- Resolve the saved theme before first paint so there's no light-mode
+       flash. app.js re-applies the same logic and handles toggling. -->
+  <script>
+    (function () {
+      try {
+        var mode = localStorage.getItem("nubsidian.theme") || "system";
+        var dark = mode === "dark" || (mode === "system" &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <aside class="sidebar">
@@ -16,6 +28,7 @@
       </button>
       <div class="head-actions">
         <span class="status" id="status" hidden title="Live updates disconnected">●</span>
+        <button class="add-root-btn" id="themeBtn" type="button" title="Theme">◐</button>
         <button class="add-root-btn" id="collapseAllBtn" type="button" title="Collapse/expand all roots">↕</button>
         <button class="add-root-btn" id="addRootBtn" type="button" title="Add a root directory">+</button>
       </div>
