@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nubsidian</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <!-- Resolve the saved theme before first paint so there's no light-mode
+       flash. app.js re-applies the same logic and handles toggling. -->
+  <script>
+    (function () {
+      try {
+        var mode = localStorage.getItem("nubsidian.theme") || "system";
+        var dark = mode === "dark" || (mode === "system" &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches);
+        document.documentElement.dataset.theme = dark ? "dark" : "light";
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <aside class="sidebar">
+    <header class="sidebar-head">
+      <button class="wordmark" id="homeBtn" type="button" title="Go to dashboard">
+        <img src="/logo.svg" alt="" class="wordmark-logo" width="30" height="30" />
+        <img src="/wordmark.svg" alt="Nubsidian" class="wordmark-text" />
+      </button>
+      <div class="head-actions">
+        <span class="status" id="status" hidden title="Live updates disconnected">●</span>
+        <button class="add-root-btn" id="themeBtn" type="button" title="Theme">◐</button>
+        <button class="add-root-btn" id="collapseAllBtn" type="button" title="Collapse/expand all roots">↕</button>
+        <button class="add-root-btn" id="addRootBtn" type="button" title="Add a root directory">+</button>
+      </div>
+    </header>
+    <nav id="tree" class="tree" aria-label="Documents"></nav>
+  </aside>
+
+  <main class="pane">
+    <header class="pane-head" id="paneHead" hidden>
+      <span class="crumb" id="crumb"></span>
+      <span class="pane-meta">
+        <span class="word-count" id="wordCount"></span>
+        <span class="save-state" id="saveState"></span>
+      </span>
+    </header>
+
+    <section id="empty" class="empty">
+      <div class="dashboard">
+        <p class="dashboard-hint" id="dashboardHint"></p>
+        <div class="recent-list" id="recentList" hidden></div>
+        <div class="root-grid" id="rootGrid"></div>
+      </div>
+    </section>
+
+    <section id="editorWrap" class="editor-wrap" hidden>
+      <div id="editor" class="editor"></div>
+      <nav id="tocPanel" class="toc-panel" hidden></nav>
+    </section>
+
+    <iframe id="htmlView" class="html-view" sandbox="allow-same-origin" hidden></iframe>
+
+    <div id="imgView" class="img-view" hidden>
+      <img id="imgViewImg" alt="" />
+    </div>
+  </main>
+
+  <div id="actionMenu" class="action-menu" hidden></div>
+
+  <div id="paletteOverlay" class="palette-overlay" hidden>
+    <div class="palette">
+      <input type="text" id="paletteInput" class="palette-input" placeholder="Jump to a file…"
+             autocomplete="off" spellcheck="false" />
+      <div id="paletteList" class="palette-list"></div>
+    </div>
+  </div>
+
+  <div id="modalOverlay" class="modal-overlay" hidden>
+    <div class="modal">
+      <p class="modal-message" id="modalMessage"></p>
+      <input type="text" id="modalInput" class="modal-input" />
+      <div class="modal-actions">
+        <button id="modalCancel" type="button">Cancel</button>
+        <button id="modalOk" type="button" class="modal-ok">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/editor.bundle.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
