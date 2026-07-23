@@ -57,6 +57,14 @@ await fs.copyFile(
   path.join(dist, "config.example.json"),
 );
 
+// The production branch is a working checkout people actually run from, so it
+// needs its own .gitignore: config.json is written there at runtime (machine-local
+// roots/port) and must stay untracked, or it dirties `git status` and fights `git pull`.
+await fs.writeFile(
+  path.join(dist, ".gitignore"),
+  ["config.json", ".DS_Store", "node_modules/", ""].join("\n"),
+);
+
 const pkg = {
   name: "nubsidian",
   private: true,
